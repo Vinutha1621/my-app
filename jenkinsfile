@@ -10,9 +10,10 @@ pipeline {
     }
 
     stages {
+
         stage('Checkout') {
             steps {
-                git 'https://github.com/Vinutha1621/my-app.git'
+                git branch: 'main', url: 'https://github.com/Vinutha1621/my-app.git'
             }
         }
 
@@ -31,7 +32,13 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('sonar') {
-                    sh 'sonar-scanner'
+                    sh """
+                    sonar-scanner \
+                      -Dsonar.projectKey=my-app \
+                      -Dsonar.sources=. \
+                      -Dsonar.python.version=3 \
+                      -Dsonar.host.url=http://localhost:9000
+                    """
                 }
             }
         }
@@ -45,18 +52,23 @@ pipeline {
             }
         }
 
+        stage('Docker Login') {
+            steps {
+                sh "docker login localhost:5000 -u admin -p admin"
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 sh "docker build -t localhost:5000/my-app:${BUILD_NUMBER} ."
-             } 
+            }
         }
 
         stage('Push Docker Image') {
             steps {
                 sh "docker push localhost:5000/my-app:${BUILD_NUMBER}"
-             }
+            }
         }
-
 
         stage('Deploy') {
             steps {
@@ -74,4 +86,5 @@ pipeline {
         }
     }
 }
+
 
