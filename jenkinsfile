@@ -26,8 +26,6 @@ pipeline {
         stage('Run Tests') {
             steps {
                 sh 'sh '/var/lib/jenkins/.local/bin/pytest --junitxml=result.xml'
-'
-'
             }
         }
 
