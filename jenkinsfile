@@ -29,19 +29,23 @@ pipeline {
             }
         }
 
-        stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv('sonar') {
-                    sh """
-                    sonar-scanner \
-                      -Dsonar.projectKey=my-app \
-                      -Dsonar.sources=. \
-                      -Dsonar.python.version=3 \
-                      -Dsonar.host.url=http://localhost:9000
-                    """
-                }
-            }
+       stage('SonarQube Analysis') {
+    steps {
+        withSonarQubeEnv('sonar') {
+            sh """
+            # Add sonar-scanner to PATH
+            export PATH=/opt/sonar-scanner/bin:\$PATH
+
+            sonar-scanner \
+              -Dsonar.projectKey=my-app \
+              -Dsonar.sources=. \
+              -Dsonar.python.version=3 \
+              -Dsonar.host.url=http://localhost:9000
+            """
         }
+    }
+}
+
 
         stage('Package') {
             steps {
